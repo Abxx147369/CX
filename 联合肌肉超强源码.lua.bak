@@ -1,0 +1,31 @@
+local url = "https://raw.githubusercontent.com/Abxx147369/CX/main/HWGdpkhaIAAnAuL.jpg"
+local asset = url
+
+if writefile and getcustomasset then
+    pcall(function() writefile("img.jpg", game:HttpGet(url)) asset = getcustomasset("img.jpg") end)
+end
+
+local function replace(obj)
+    if obj:IsA("ImageLabel") or obj:IsA("ImageButton") or obj:IsA("Decal") or obj:IsA("Texture") then
+        for _, p in ipairs({"Image", "HoverImage", "PressedImage", "BackgroundImage", "Texture"}) do
+            pcall(function() obj[p] = asset end)
+        end
+    end
+end
+
+local function scanAndReplace(container)
+    for _, v in ipairs(container:GetDescendants()) do
+        replace(v)
+    end
+    container.DescendantAdded:Connect(replace)
+end
+
+scanAndReplace(game:GetService("CoreGui"))
+scanAndReplace(game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"))
+
+task.spawn(function()
+    while task.wait(2) do
+        for _, v in ipairs(game:GetService("CoreGui"):GetDescendants()) do replace(v) end
+        for _, v in ipairs(game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui"):GetDescendants() or {}) do replace(v) end
+    end
+end)
